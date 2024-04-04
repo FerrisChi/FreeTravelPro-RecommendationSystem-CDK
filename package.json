@@ -16,14 +16,10 @@
     "jest": "^25.0.0"
   },
   "dependencies": {
-    "@aws-cdk/aws-kinesis": "^1.121.0",
-    "@aws-cdk/aws-kinesisfirehose-alpha": "^2.93.0-alpha.0",
-    "@aws-cdk/aws-kinesisfirehose-destinations-alpha": "^2.93.0-alpha.0",
-    "@aws-cdk/aws-lambda-event-sources": "^1.94.1",
     "@aws-sdk/client-personalize": "^3.363.0",
     "@aws-sdk/client-personalize-events": "^3.388.0",
     "@aws-sdk/client-personalize-runtime": "^3.388.0",
-    "aws-cdk-lib": "2.87.0",
+    "aws-cdk-lib": "^2.87.0",
     "constructs": "^10.0.0",
     "js-yaml": "^4.1.0",
     "lodash": "^4.17.21"

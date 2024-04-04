@@ -113,7 +113,7 @@ cdk deploy --parameters bucketARN=$bucketARN \
    --parameters itemDataLocation=$itemDataLocation \
    --parameters solutionRegion=$solutionRegion
    ```
-Once is the solution is deployed, you will see the output of the API Gateway which will be used in the next steps. 
+Once the solution is deployed, you will see the output of the API Gateway which will be used in the next steps. 
 
 
 CDK lacks the capability to generate three resources:
@@ -153,8 +153,8 @@ curl --location 'https://{your-api-id}.execute-api.{region}.amazonaws.com/prod/d
 
 ### 2.3 Campaign
 
-The campaign  will serve to offer personalized recommendations to users based on the recipe used in the previously created solution
-version. For more information about recipes ARN se this [link](https://docs.aws.amazon.com/personalize/latest/dg/working-with-predefined-recipes.html).
+The campaign will serve to offer personalized recommendations to users based on the recipe used in the previously created solution
+version. For more information about recipes ARN see this [link](https://docs.aws.amazon.com/personalize/latest/dg/working-with-predefined-recipes.html).
 
 To create the campaign the  `/campaign` API is invoked by providing the solution version ARN from the previous step and the name of the campaign as body of the POST request.
 
@@ -184,7 +184,7 @@ curl --location 'https://{your-api-id}.execute-api.{region}.amazonaws.com/prod/e
 --header 'Content-Type: application/json' \
 --data '{
 "name" : "{your-event-tracker-name}",
-"datasetGroupArn": "arn:aws:personalize:{region}:{accountId}:dataset-group/{your-dataset}"
+"datasetGroupArn": "arn:aws:personalize:{region}:{accountId}:dataset-group/{your-dataset-group}"
 }'
 ```
 
