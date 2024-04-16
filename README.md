@@ -1,46 +1,39 @@
-# Near Realtime recommendations with Amazon Personalize using Amazon Cloud Development Kit (CDK) and Amazon Software Development Kit (SDK)
+# Near real-time attraction recommendation system for Travel Free Pro
 
-This article describes the implementation of a reference architecture for a real-time personalized recommendation system 
-suggested in the post [Architecting near real-time personalized recommendations with Amazon Personalize](https://aws.amazon.com/blogs/architecture/architecting-near-real-time-personalized-recommendations-with-amazon-personalize/),
-The purpose is to offer a rapidly deployable solution that can also be seamlessly integrated with existing applications requiring personalized recommendation capabilities.
+## Overview 
+This repository contains the implementation of a real-time personalized travel attraction recommendation system, designed as a microservice for the Travel Free Pro mobile application. The architecture is based on [Amazon Personalize](https://aws.amazon.com/personalize/), inspired by the approach detailed in the blog post, ["Architecting near real-time personalized recommendations with Amazon Personalize"](https://aws.amazon.com/blogs/architecture/architecting-near-real-time-personalized-recommendations-with-amazon-personalize/).
 
-By combining Amazon Personalize with Event Tracker, a robust architecture can be implemented to provide 
-personalized recommendations in real time. This solution delivers a highly relevant user experience and improves customer retention and satisfaction, 
-thus providing a significant competitive advantage for businesses.
+The primary goal of this system is to provide a rapidly deployable solution that can be seamlessly integrated into existing applications. This integration aims to enhance applications with capabilities to offer personalized travel attraction recommendations.
 
-## How does Amazon Personalize work?
+The architecture leverages Amazon Personalize in conjunction with the Event Tracker feature to create a robust system capable of delivering real-time, personalized travel attraction recommendations. This solution is designed to enhance user engagement by delivering highly relevant content, thereby improving customer retention and satisfaction. These improvements provide a significant competitive edge, particularly useful for businesses involved in travel planning and related services.
 
-To initiate the process, you provide data concerning users and items to Amazon Personalize. The data used for modeling in 
-Personalize falls into three distinct types (see Figure 1). The first pertains to user activity, encompassing events like clicks, 
-purchases, or views of items.The event type selected for Personalize depends on your business and applications, as this dataset 
-holds the strongest signal for personalization and is the sole one required by the service.
+## Key Features
 
-The second dataset type includes item details, such as price, category, style, genre - essentially, the information already 
-available in your catalog. While optional, this dataset proves highly valuable for scenarios like initiating recommendations for new items.
-The third dataset type contains user specifics, such as location, age, gender, subscription tier, etc.
+- **Real-Time Recommendations**: Leverage real-time data processing to provide immediate personalized travel recommendations based on user interactions and preferences.
 
-To get your data into the service, two methods are available: bulk importing through dataset import jobs, an efficient 
-way to bootstrap your models with historical event data, and streaming events, items, and users through the `Put Events`, `Put Items`, and `Put Users` APIs.
+- **Seamless Integration**: Designed as a microservice, this system can be effortlessly integrated into existing travel planning applications, enhancing them with advanced recommendation capabilities without significant alterations to their architecture.
 
-By adopting these approaches, you ensure your data in Personalize remains up-to-date with the latest interactions and metadata 
-from your applications. Once your data is in the service, you can create a customized, private personalization model trained and hosted specifically for you. 
-Consequently, you can provide tailored recommendations to your users through a private API.
+- **User Behavior Tracking**: Incorporates an Event Tracker that captures and analyzes user actions within the application, allowing for more tailored and accurate recommendations based on individual travel interests and behavior patterns.
 
-![Figure1.png](images/Picture1.png)
+- **Scalable Architecture**: Built on Amazon Personalize, the architecture is inherently scalable, capable of handling varying loads from different numbers of users, making it suitable for applications ranging from startups to large enterprises.
 
-<span style="color:grey">Figure 1: Amazon Personalize high level overview.</span>
+- **Feedback Loop**: Implements a continuous feedback mechanism that refines recommendation algorithms based on user interactions and satisfaction, ensuring the system evolves to meet user expectations better.
 
+- **Diverse Recommendation Criteria**: Not only based on user history but also considers contextual factors like location, time of the year, and local events, providing diverse and dynamic travel suggestions.
 
-## Real time recommendations with Event Tracker architecture overview 
+- **Privacy-First Design**: Ensures user data is handled with the utmost security and compliance with privacy laws, making sure that personal information is protected while delivering personalized experiences.
 
-Prior to delving into the description of the architecture components, it is necessary to mention the stack of technologies on which the solution 
-is based for resource provisioning.
+- **Analytics Dashboard**: Features an integrated analytics dashboard on AWS that provides insights into user behavior, system performance, and recommendation effectiveness, helping to drive business decisions and system improvements.
+
+## Result
+After deployment, recommendations can be received in real-time through API calls.
+![result picture](assets/images/results.png)
+
+## Real time recommendations with Event Tracker architecture
+
+Prior to delving into the description of the architecture components, it is necessary to mention the stack of technologies on which the solution is based for resource provisioning.
 The project is built with AWS Cloud Development Kit using Javascript ([AWS CDK](https://docs.aws.amazon.com/cdk/v2/guide/home.html)) and [SDK for JavaScript](https://aws.amazon.com/sdk-for-javascript/).
-Amazon Personalize is a service that does not yet have official hand-written ([L2](https://docs.aws.amazon.com/cdk/v2/guide/constructs.html#constructs_lib)) constructors. So the automatically generated [L1](https://docs.aws.amazon.com/cdk/v2/guide/constructs.html#constructs_lib) 
-constructors must be used. However, there are not all the constructors needed to implement the solution using only AWS CDK, 
-so it is necessary to make use of SDK for JavaScript for the provisioning of missing resources. Figure 3 shows the real time recommendation proposed architecture. 
-
-The interactions dataset used in this example contains interactions (EVENT_TYPE column) of users (USER_ID column) with items (ITEM_ID column), movies for this particular use case, in a given time (TIMESTAMP column). 
+Amazon Personalize is a service that does not yet have official hand-written ([L2](https://docs.aws.amazon.com/cdk/v2/guide/constructs.html#constructs_lib)) constructors. So the automatically generated [L1](https://docs.aws.amazon.com/cdk/v2/guide/constructs.html#constructs_lib) constructors must be used. However, there are not all the constructors needed to implement the solution using only AWS CDK, so it is necessary to make use of SDK for JavaScript for the provisioning of missing resources. Figure 3 shows the real-time recommendation proposed architecture. 
 
 ### 1 Prerequisites
 
@@ -75,23 +68,25 @@ therefore the bucket cannot be created from the project itself as it would be em
 
 On the other hand, you must provide the data, in this case the interactions dataset, in form of a *.csv* file, required for Amazon Personalize and upload it to the S3
 Bucket before deploying the solution. 
-This example is using the interactions dataset available in this [link](https://github.com/aws-samples/amazon-personalize-samples/blob/master/next_steps/workshops/POC_in_a_box/completed/poc_data/interactions.csv).
 
-Recommendations are determined by analyzing the connections involving two main entities: users or items.
-Although the  model is capable of suggesting based on a user's past interactions, 
-the quality of these suggestions can be enhanced when the model possesses data about the associations among users or items .
-To illustrate, if user 123 has engaged with movies a, b, and c – all categorized as Drama in the item dataset – 
-Amazon Personalize will  suggest movies (items) with the same genre.
-Therefore, a dataset of items is also created and is available at this [link](https://github.com/aws-samples/amazon-personalize-samples/blob/master/next_steps/workshops/POC_in_a_box/completed/poc_data/item-meta.csv).
+Recommendations are determined by analyzing the connections involving two main entities: users and items. Although the model is capable of suggestions based on a user's past interactions, the quality of these suggestions can be enhanced when the model possesses data about the associations among users or items.
+
+The fake datasets used in this example are in `data/`, including `event_data.csv` `user_data.csv`, and `item_data.csv` files. 
+The fake interactions dataset used in this example contains:
+
+* `event_data.csv` contains interactions (EVENT_TYPE column) of users (USER_ID column) with items (ITEM_ID column), and travel attractions for this particular use case, in a given time (TIMESTAMP column). 
+* `item_data.csv` contains travel attraction information including ID (ITEM_ID), the type of the attraction (GENRE) and a brief description (DESCRIPTION) of it.
+* `user_data.csv` contains user (USER_ID) personal information with their age (AGE).
 
 ## 2 Deploying the solution
 
-- Install and configure [AWS CLI](https://aws.amazon.com/cli/) and [AWS CDK](https://aws.amazon.com/cdk/) in your development environment.
+### 2.0 Install and configure [AWS CLI](https://aws.amazon.com/cli/) and [AWS CDK](https://aws.amazon.com/cdk/)
+Make sure you can use `cdk` command in your development environment.
 
 ### 2.1 Deployment
 
 Clone the repository using the following command: 
-- `git clone https://github.com/aws-samples/near-real-time-recommendations-with-amazon-personalize-aws-sdk-cdk.git`
+- `git clone https://github.com/FerrisChi/aws-personalize-recommendation-cdk.git`
 
 In the root directory of the cloned repository, run the following command:
 
@@ -99,10 +94,10 @@ In the root directory of the cloned repository, run the following command:
 
 Export the following environment variables:
 
-- `export bucketARN=` Whose value is the bucket ARN from the prerequisites section. For example: _`arn:aws:s3:::your-bucket-name`_
-- `export bucketObjectsARN=` Whose value is the bucket ARN from the prerequisites section containing the objects. For example: _`arn:aws:s3:::your-bucket-name/*`_
-- `export interactionDataLocation=` Whose value is the URI of your interaction dataset. For example:  _`s3://your-bucket-name/file.csv`._
-- `export itemDataLocation=` Whose value is the URI of your item dataset. For example:  _`s3://your-bucket-name/file.csv`._
+- `export bucketARN=` Whose value is the bucket ARN from the prerequisites section. For example _`arn:_aws:s3:::your-bucket-name`_.
+- `export bucketObjectsARN=` Whose value is the bucket ARN from the prerequisites section containing the objects. For example  _`arn:aws:s3:::your-bucket-name/*`_
+- `export interactionDataLocation=` Whose value is the URI of your interaction dataset. For example  _`s3://your-bucket-name/file.csv`._
+- `export itemDataLocation=` Whose value is the URI of your item dataset. For example  _`s3://your-bucket-name/file.csv`._
 - `export solutionRegion=` Region where the solution is deployed.
 
 In the root directory run the following command:
@@ -124,7 +119,7 @@ some lambdas contain permissions on resources by specifying that it is a wildcar
 Since these resources are created after the deployment of the solution from CDK,
 it is not possible to specify their ARNs.
 
-Furthermore, you can find the [Near real time recommendations - Blog.postman_collection.json](Near%20real%20time%20recommendations%20-%20Blog.postman_collection.json)  collection attached to the root directory to make the API calls.
+Furthermore, you can find the `recommend.postman_collection.json` or `commands.sh` collection attached to the `assets/` directory to make the API calls.
 
 ### 2.2 Solution Version
 
@@ -191,7 +186,7 @@ curl --location 'https://{your-api-id}.execute-api.{region}.amazonaws.com/prod/e
 ### Proposed Architecture data flow 
 
 
-![Figure3-new.png](images/Picture3-new.png)
+![Figure3-new.png](assets/images/Picture3-new.png)
 <span style="color:grey">Figure 2: Real time recommendation proposed architecture.</span>
 
 **1.** Once you deploy the application for the first time, a dataset group is created which will contain the data that will be used to train the Amazon Personalize solution.
@@ -215,15 +210,12 @@ with Amazon Kinesis Data Firehouse to persist the interactions data.
 **6.** The Event Tracker is used to ingest new data in the recommendation system.
 
 ## 3 Getting recommendations
-In this scenario, the interaction dataset comprises movie IDs. Consequently, the recommendations presented to the user will 
-consist of movie IDs that align most closely with their personal preferences, determined from their historical interactions.
+In this scenario, the interaction dataset comprises attraction IDs. Consequently, the recommendations presented to the user will consist of attraction IDs that align most closely with their personal preferences, determined from their historical interactions.
 
 Remember that you can adapt the solution to the specific needs of your application as long as the requirements of the data dataset are fulfilled.
-Visit the key considerations and best practices section of [this](https://aws.amazon.com/blogs/architecture/architecting-near-real-time-personalized-recommendations-with-amazon-personalize/) post. 
 
 Once the application is fully deployed, you can use the `getRecommendations` API  to retrieve personalized recommendations for a 
-particular user by sending its associated _userID_ from the interactions' dataset. Another parameters that is sent is the number of 
-results or recommendations that you need for the particular user as well as the campaign ARN. You can find the campaign ARN in the Amazon Personalize console menu. 
+particular user by sending its associated _userID_ from the interactions' dataset. Another parameters that is sent is the number of results or recommendations that you need for the particular user as well as the campaign ARN. You can find the campaign ARN in the Amazon Personalize console menu. 
 
 For example, the following request will retrieve 5 recommendations for the user whose userId is 429:
 
@@ -266,11 +258,9 @@ Response:
 }
 
 ```
-The items returned by the API call are the movies that Amazon Personalize recommends to the given user based on their interactions.
+The items returned by the API call are the attractions that Amazon Personalize recommends to the given user based on their interactions.
 
-The score values provided in this context represent floating-point numbers ranging between zero and 1.0. 
-These values correspond to the current campaign and the associated recipes for this particular use case. 
-They are determined based on the collective scores assigned to all items present in your comprehensive dataset.
+The score values provided in this context represent floating-point numbers ranging between zero and 1.0. These values correspond to the current campaign and the associated recipes for this particular use case. They are determined based on the collective scores assigned to all items present in your comprehensive dataset.
 
 Consequently, as the number of items within your dataset increases, the absolute values of these scores diminish. It is noteworthy that the cumulative sum of these scores across your entire dataset equates to 1.0. Hence, it is imperative not to attribute excessive significance to the absolute score values in the context of user-personalization. Rather, these scores should be utilized comparatively within the realm of the same recommendations response. This approach enables a comprehension of the varying degrees of strength in relevance among different items.
 
@@ -356,7 +346,7 @@ On the other hand, you can then check the CloudWatch Logs of the `PutEvents` lam
 
 By now, your interactions dataset includes the API-generated events. Confirm their successful delivery to Amazon Personalize by reviewing Event Tracker metrics in CloudWatch under: All > AWS/Personalize > EventType, EventTrackerArn. Choose your EventTracker's ARN and the EventType from your API request. The Figure 4 shows an example of how the events are illustrated in CloudWatch metrics. Every blue cursor represent the number of events sent to the EventTracker in a given time. For demonstration purposes more than 2 events were sent.
 
-![Figure4.png](images/Picture4.png)
+![Figure4.png](assets/images/Picture4.png)
 <span style="color:grey">Figure 3: Events in CloudWatch Metrics.</span>
 
 Since the interactions dataset has been updated, the recommendations will also be automatically updated to take into account the new interactions. To do this, we can call the `getRecommendations` API again for the same user, whose id is 429, and the result should be different from the previous one. 
@@ -402,6 +392,7 @@ Response:
     "recommendationId": "RID-ef-45f1-85e8-fce9564dafee-CID-f2c90e"
 }
 ```
+
 Note that it was not necessary to create a new solution version after ingesting the new interactions. This is because for 
 the case of the type of recipe used in this example _-User-Personalization recipe-_ Amazon Personalize automatically incorporates new items into your most recent fully trained solution version to enhance recommendations. For more information about how real-time events influence recommendations see [this](https://docs.aws.amazon.com/personalize/latest/dg/recording-events.html) link.
 
@@ -427,7 +418,6 @@ Then, you can run the following command in the root directory of the repository 
 
 - `cdk destroy`
 
+## Conclusion
 
-### Conclusion
-
-In this article, we demonstrated the process of deploying personalized recommendations system in near real-time by utilizing Amazon Personalize in conjunction with dedicated AWS data services. Furthermore, since the implemented solution provides APIs for both retrieving recommendations and ingesting new events, it can seamlessly integrate into an existing application regardless of its language or platform. In addition, it is a solution that can be deployed quickly due to the potential of infrastructure as code tools. 
+In this project, we demonstrated the implementation and deployment of a real-time personalized travel attraction recommendation system using Amazon Personalize, coupled with various AWS data services. This system is designed to offer APIs for both retrieving personalized recommendations and ingesting new user events, ensuring seamless integration with existing applications, irrespective of the programming language or platform used. Additionally, the adoption of Infrastructure as Code (IaC) tools significantly accelerates deployment, allowing for rapid scalability and easy maintenance. This approach not only enhances user engagement through personalized experiences but also provides a flexible, efficient solution for businesses looking to improve their service offerings in the travel industry.
